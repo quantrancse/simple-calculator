@@ -1,8 +1,3 @@
-/**
- * Linked List
- *
- **/
-
 #include "LinkedList.h"
 #include <iostream>
 

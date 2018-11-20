@@ -23,7 +23,6 @@ Stack<DataType>::~Stack() {
     delete[] storage;
 }
 
-
 template <class DataType>
 int Stack<DataType>::size() {
     return csize;

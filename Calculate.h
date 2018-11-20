@@ -10,12 +10,12 @@
 #include "Token.h"
 
 class Calculate {
-    private:
-        LinkedList<Token> token_list;
-        LinkedList<Token> postfix_list;
-        LinkedList<Token> var_list;
-    public:
+   private:
+    LinkedList<Token> token_list;
+    LinkedList<Token> postfix_list;
+    LinkedList<Token> var_list;
 
+   public:
     bool checkOperator(char);
     int getPriority(TokenType);
     void getToken(string);
