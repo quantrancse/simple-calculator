@@ -13,6 +13,6 @@ class Node {
 
     Node();
     Node(DataType);
-    ~Node();
+    //~Node();
 };
 #endif

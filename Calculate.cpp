@@ -34,6 +34,8 @@ int Calculate::getPriority(TokenType token) {
         case LEFT:
         case RIGHT:
             return -1;
+        default:
+            return -2;
     }
 }
 
@@ -227,7 +229,7 @@ float Calculate::cal(string input_string) {
                 s.pop();
                 val2 = s.top();
                 s.pop();
-                s.push(pow(val1, val2));
+                s.push(pow(val2, val1));
                 break;
             case UNI_MINUS:
                 val1 = s.top();
@@ -276,10 +278,11 @@ void Calculate::calVar(string str) {
             str = str.substr(pos + 1, string::npos);
         }
     }
-
+    
     cout << "Result:" << endl;
     for (int i = 0; i < var_list.length(); i++)
         cout << var_list.getAt(i).getVarName() << " = " << fixed << setprecision(2) << stof(var_list.getAt(i).getValue()) << endl;
+    
 }
 
 void Calculate::eval(string input_str) {
@@ -289,7 +292,7 @@ void Calculate::eval(string input_str) {
     for (int i = 0; i < input_str.length(); i++)
         if (input_str[i] != ' ')
             str.push_back(input_str[i]);
-
+    
     // Check for valid of '(' and ')'
     int count = 0;
     for (int i = 0; i < str.length(); i++) {
@@ -307,7 +310,7 @@ void Calculate::eval(string input_str) {
         exit(0);
     }
 
-    // Check for valid of Operator and devide 0
+    // Check for valid of Operator and devide zero
     string str_check = "";
     str_check.push_back(str[0]);
     for (int i = 1; i < str.length(); i++) {
@@ -318,7 +321,7 @@ void Calculate::eval(string input_str) {
             }
         if (str[i] == '0')
             if (str_check[str_check.length() - 1] == '/') {
-                cout << "Cannot divide 0" << endl;
+                cout << "Cannot divide zero" << endl;
                 exit(0);
             }
         str_check.push_back(str[i]);

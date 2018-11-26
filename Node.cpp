@@ -13,7 +13,9 @@ Node<DataType>::Node(DataType value) {
     pNext = NULL;
 }
 
+/*
 template <class DataType>
 Node<DataType>::~Node() {
     delete pNext;
 }
+*/
