@@ -219,6 +219,10 @@ float Calculate::cal(string input_string) {
                 break;
             case DIV:
                 val1 = s.top();
+                if (val1 == 0) {
+                    cout << "Cannot divide zero" << endl;
+                    exit(0);
+                }
                 s.pop();
                 val2 = s.top();
                 s.pop();
@@ -278,11 +282,10 @@ void Calculate::calVar(string str) {
             str = str.substr(pos + 1, string::npos);
         }
     }
-    
+
     cout << "Result:" << endl;
     for (int i = 0; i < var_list.length(); i++)
         cout << var_list.getAt(i).getVarName() << " = " << fixed << setprecision(2) << stof(var_list.getAt(i).getValue()) << endl;
-    
 }
 
 void Calculate::eval(string input_str) {
@@ -292,7 +295,7 @@ void Calculate::eval(string input_str) {
     for (int i = 0; i < input_str.length(); i++)
         if (input_str[i] != ' ')
             str.push_back(input_str[i]);
-    
+
     // Check for valid of '(' and ')'
     int count = 0;
     for (int i = 0; i < str.length(); i++) {
