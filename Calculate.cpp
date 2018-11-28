@@ -157,11 +157,15 @@ void Calculate::InfixToPostfix() {
                 s.pop();
             }
         } else {
-            while (!s.empty() && getPriority(token_list.getAt(i).getType()) <= getPriority(s.top().getType())) {
-                postfix_list.append(s.top());
-                s.pop();
+            if (getPriority(token_list.getAt(i).getType()) == 4 && getPriority(s.top().getType()) == 3)     // Negative exponent
+                s.push(token_list.getAt(i));
+            else {
+                while (!s.empty() && getPriority(token_list.getAt(i).getType()) <= getPriority(s.top().getType())) {
+                    postfix_list.append(s.top());
+                    s.pop();
+                }
+                s.push(token_list.getAt(i));
             }
-            s.push(token_list.getAt(i));
         }
     }
 
@@ -302,14 +306,14 @@ void Calculate::eval(string input_str) {
         if (str[i] == ')')
             count--;
         if (count < 0) {
-            cout << "Invalid Input" << endl;
+            cout << "Invalid Parentheses Input" << endl;
             exit(0);
         }
         if (str[i] == '(')
             count++;
     }
     if (count != 0) {
-        cout << "Invalid Input" << endl;
+        cout << "Invalid Parentheses Input" << endl;
         exit(0);
     }
 
