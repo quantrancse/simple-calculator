@@ -78,7 +78,6 @@ void Calculate::getToken(string pre_str) {
             check = 1;
         } else if ((checkOperator(str[0]) == 0 && str[0] != ')')|| ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z'))) {
             token.push_back(str[0]);
-            cout << "OK" << endl;
             check = 2;
         } else if (check == 1) {
             Token s(token, DATA);
