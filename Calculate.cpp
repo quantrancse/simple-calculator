@@ -69,11 +69,16 @@ void Calculate::getToken(string pre_str) {
     while (str[0] != '\0') {
         if (check == 0)
             token = "";
-        if (check != 2 && ((str[0] >= '0' && str[0] <= '9') || str[0] == '.')) {
+        if (str[0] == '(') {
+            token = str[0];
+            Token s(token, LEFT);
+            token_list.append(s);
+        } else if (check != 2 && ((str[0] >= '0' && str[0] <= '9') || str[0] == '.')) {
             token.push_back(str[0]);
             check = 1;
-        } else if (checkOperator(str[0]) == 0 || ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z'))) {
+        } else if ((checkOperator(str[0]) == 0 && str[0] != ')')|| ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z'))) {
             token.push_back(str[0]);
+            cout << "OK" << endl;
             check = 2;
         } else if (check == 1) {
             Token s(token, DATA);
@@ -113,10 +118,6 @@ void Calculate::getToken(string pre_str) {
             token = str[0];
             Token s(token, POW);
             token_list.append(s);
-        } else if (str[0] == '(') {
-            token = str[0];
-            Token s(token, LEFT);
-            token_list.append(s);
         } else if (str[0] == ')') {
             token = str[0];
             Token s(token, RIGHT);
@@ -141,7 +142,7 @@ void Calculate::getToken(string pre_str) {
 
 // Infix token list to Postfix token list
 void Calculate::InfixToPostfix() {
-    Stack<Token> s(100);
+    Stack<Token> s(1000);
 
     for (int i = 0; i < token_list.length(); i++) {
         if (getPriority(token_list.getAt(i).getType()) == 0)
@@ -157,7 +158,7 @@ void Calculate::InfixToPostfix() {
                 s.pop();
             }
         } else {
-            if (getPriority(token_list.getAt(i).getType()) == 4 && getPriority(s.top().getType()) == 3)     // Negative exponent
+            if (getPriority(token_list.getAt(i).getType()) == 4 && getPriority(s.top().getType()) == 3)  // Negative exponent
                 s.push(token_list.getAt(i));
             else {
                 while (!s.empty() && getPriority(token_list.getAt(i).getType()) <= getPriority(s.top().getType())) {
@@ -180,9 +181,10 @@ float Calculate::cal(string input_string) {
     getToken(input_string);
     InfixToPostfix();
 
-    Stack<float> s(100);
+    Stack<float> s(1000);
     float val1 = 0.0;
     float val2 = 0.0;
+    int sign = 1;
     for (int i = 0; i < postfix_list.length(); i++) {
         bool check = false;  // check if there is valid variable
         switch (postfix_list.getAt(i).getType()) {
@@ -236,8 +238,12 @@ float Calculate::cal(string input_string) {
                 val1 = s.top();
                 s.pop();
                 val2 = s.top();
+                if (val2 < 0) {
+                    sign = -1;
+                    val2 *= sign;
+                }
                 s.pop();
-                s.push(pow(val2, val1));
+                s.push(pow(val2, val1) * sign);
                 break;
             case UNI_MINUS:
                 val1 = s.top();
