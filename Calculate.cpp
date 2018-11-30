@@ -205,6 +205,7 @@ float Calculate::cal(string input_string) {
                 val1 = s.top();
                 if (val1 == 0) {
                     cout << "Cannot divide zero" << endl;
+                    // system("pause");
                     exit(0);
                 }
                 s.pop();
@@ -246,6 +247,7 @@ string Calculate::getFormula(string input_str) {
     }
     if (str.compare("") == 0) {
         cout << "Invalid Input" << endl;
+        // system("pause");
         exit(0);
     }
     return str;
@@ -313,7 +315,7 @@ void Calculate::eval(string input_str) {
             str.push_back('+');
             continue;
         }
-        if (input_str[i] == '-' && checkOperator(str[str.length() - 1]) && str[str.length() - 1] != '^')
+        if (input_str[i] == '-' && (str[str.length() - 1] == '=' || str[str.length() - 1] == '('))
             str.push_back('0');
         if (input_str[i] != ' ')
             str.push_back(input_str[i]);
