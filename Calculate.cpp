@@ -40,30 +40,10 @@ int Calculate::getPriority(TokenType token) {
 }
 
 // Split string to token with value and type
-void Calculate::getToken(string pre_str) {
+void Calculate::getToken(string str) {
     char pre = '#';  // Check if Uni at first pos
     string token = "";
     int check = 0;
-
-    // Check if multi '+' and '-'
-    string str;
-    str.push_back(pre_str[0]);
-    for (int i = 1; i < pre_str.length(); i++) {
-        if (pre_str[i] == '+') {
-            if (str[str.length() - 1] == '+')
-                continue;
-            else
-                str.push_back('+');
-        }
-        if (pre_str[i] == '-') {
-            if (str[str.length() - 1] == '-') {
-                str.pop_back();
-                str.push_back('+');
-            } else
-                str.push_back('-');
-        } else if (pre_str[i] != '+')
-            str.push_back(pre_str[i]);
-    }
 
     // Split
     while (str[0] != '\0') {
@@ -76,7 +56,7 @@ void Calculate::getToken(string pre_str) {
         } else if (check != 2 && ((str[0] >= '0' && str[0] <= '9') || str[0] == '.')) {
             token.push_back(str[0]);
             check = 1;
-        } else if ((checkOperator(str[0]) == 0 && str[0] != ')')|| ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z'))) {
+        } else if ((checkOperator(str[0]) == 0 && str[0] != ')') || ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z'))) {
             token.push_back(str[0]);
             check = 2;
         } else if (check == 1) {
@@ -157,7 +137,7 @@ void Calculate::InfixToPostfix() {
                 s.pop();
             }
         } else {
-            if (getPriority(token_list.getAt(i).getType()) == 4 && getPriority(s.top().getType()) == 3)  // Negative exponent
+            if ((getPriority(token_list.getAt(i).getType()) == 4 || getPriority(token_list.getAt(i).getType()) == 3) && getPriority(s.top().getType()) == 3)  // Negative exponent
                 s.push(token_list.getAt(i));
             else {
                 while (!s.empty() && getPriority(token_list.getAt(i).getType()) <= getPriority(s.top().getType())) {
@@ -183,7 +163,6 @@ float Calculate::cal(string input_string) {
     Stack<float> s(1000);
     float val1 = 0.0;
     float val2 = 0.0;
-    int sign = 1;
     for (int i = 0; i < postfix_list.length(); i++) {
         bool check = false;  // check if there is valid variable
         switch (postfix_list.getAt(i).getType()) {
@@ -237,12 +216,8 @@ float Calculate::cal(string input_string) {
                 val1 = s.top();
                 s.pop();
                 val2 = s.top();
-                if (val2 < 0) {
-                    sign = -1;
-                    val2 *= sign;
-                }
                 s.pop();
-                s.push(pow(val2, val1) * sign);
+                s.push(pow(val2, val1));
                 break;
             case UNI_MINUS:
                 val1 = s.top();
@@ -263,11 +238,16 @@ float Calculate::cal(string input_string) {
 // Split variable formula for calculate
 string Calculate::getFormula(string input_str) {
     string str = "";
-    for (int i = 0; i < input_str.length(); i++)
+    for (int i = 0; i < input_str.length(); i++) {
         if (input_str[i] == ';' || input_str[i] == '\0')
             break;
         else if (input_str[i] != '=')
             str.push_back(input_str[i]);
+    }
+    if (str.compare("") == 0) {
+        cout << "Invalid Input" << endl;
+        exit(0);
+    }
     return str;
 }
 
@@ -300,44 +280,53 @@ void Calculate::calVar(string str) {
 void Calculate::eval(string input_str) {
     string str;
 
-    // Delete space
-    for (int i = 0; i < input_str.length(); i++)
-        if (input_str[i] != ' ')
-            str.push_back(input_str[i]);
-
-    // Check for valid of '(' and ')'
+    // Check for valid input
     int count = 0;
-    for (int i = 0; i < str.length(); i++) {
-        if (str[i] == ')')
+    for (int i = 0; i < input_str.length(); i++) {
+        if (input_str[i] == ')')
             count--;
         if (count < 0) {
             cout << "Invalid Parentheses Input" << endl;
+            // system("pause");
             exit(0);
         }
-        if (str[i] == '(')
+        if (input_str[i] == '(')
             count++;
+        if ((input_str[i] == '(' && str[str.length() - 1] == ')') || (input_str[i] == ')' && str[str.length() - 1] == '(')) {
+            cout << "Invalid Parentheses Input" << endl;
+            // system("pause");
+            exit(0);
+        }
+        if (input_str[i] == ')' && checkOperator(str[str.length() - 1])) {
+            cout << "Invalid Operator Input" << endl;
+            // system("pause");
+            exit(0);
+        }
+        if ((input_str[i] == '*' || input_str[i] == '/' || input_str[i] == '^') && checkOperator(str[str.length() - 1])) {
+            cout << "Invalid Operator Input" << endl;
+            exit(0);
+        }
+        if (input_str[i] == '+' && checkOperator(str[str.length() - 1]))
+            continue;
+        if (input_str[i] == '-' && str[str.length() - 1] == '-') {
+            str.pop_back();
+            str.push_back('+');
+            continue;
+        }
+        if (input_str[i] == '-' && checkOperator(str[str.length() - 1]) && str[str.length() - 1] != '^')
+            str.push_back('0');
+        if (input_str[i] != ' ')
+            str.push_back(input_str[i]);
     }
     if (count != 0) {
         cout << "Invalid Parentheses Input" << endl;
+        // system("pause");
         exit(0);
     }
-
-    // Check for valid of Operator and devide zero
-    string str_check = "";
-    str_check.push_back(str[0]);
-    for (int i = 1; i < str.length(); i++) {
-        if (str[i] == '*' || str[i] == '/' || str[i] == '^')
-            if (checkOperator(str_check[str_check.length() - 1])) {
-                cout << "Invalid Operator Input" << endl;
-                exit(0);
-            }
-        if (str[i] == '0')
-            if (str_check[str_check.length() - 1] == '/') {
-                cout << "Cannot divide zero" << endl;
-                exit(0);
-            }
-        str_check.push_back(str[i]);
-    }
+    while (str[0] == '+')
+        str.erase(0, 1);
+    if (str[0] == '-')
+        str.insert(0, "0");
 
     bool check = 0;
     for (int i = 0; i < str.length(); i++)
