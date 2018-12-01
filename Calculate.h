@@ -21,7 +21,6 @@ class Calculate {
     void getToken(string);
     void InfixToPostfix();
     float cal(string);
-    string getFormula(string);
     void calVar(string);
     void eval(string);
 };
