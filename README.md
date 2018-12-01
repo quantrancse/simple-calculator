@@ -1,6 +1,6 @@
 # Simple Calculator
 
-Simple Calculator using Linked List and Stack support funtion with variables
+Simple Calculator using Linked List and Stack support functions with variables
 
 ## Getting Started
 
