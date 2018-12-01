@@ -236,47 +236,26 @@ float Calculate::cal(string input_string) {
     return s.top();
 }
 
-// Split variable formula for calculate
-string Calculate::getFormula(string input_str) {
-    string str = "";
-    for (int i = 0; i < input_str.length(); i++) {
-        if (input_str[i] == ';' || input_str[i] == '\0')
-            break;
-        else if (input_str[i] != '=')
-            str.push_back(input_str[i]);
-    }
-    if (str.compare("") == 0) {
-        cout << "Invalid Input" << endl;
-        // system("pause");
-        exit(0);
-    }
-    return str;
-}
-
 // Call if calculate variabble
 void Calculate::calVar(string str) {
     string token_name = "";
 
-    // Get variables and get their value
+    // Get variables and calculate their value
     while (str[0] != '\0') {
-        if ((str[0] >= '0' && str[0] <= '9') || (str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z') || str[0] == '.' || str[0] == '_' || str[0] == '-') {
+        if (str[0] != '=') {
             token_name.push_back(str[0]);
             str = str.substr(1, string::npos);
         } else if (str[0] == '=') {
-            string formula = getFormula(str);
-            Token s(to_string(cal(formula)), token_name, VAR);  // Get valriable value
+            str = str.substr(1, string::npos);
+            if (str.empty()) {
+                cout << "Invalid Input" << endl;
+                exit(0);
+            }
+            Token s(to_string(cal(str)), token_name, VAR);  // Get valriable value
             var_list.append(s);
-            token_name = "";
-            size_t pos = str.find_first_of(';');  // Split for next variable
-            if (pos == string::npos)
-                break;
-            str = str.substr(pos + 1, string::npos);
+            break;
         }
     }
-
-    cout << "Result:" << endl;
-    for (int i = 0; i < var_list.length(); i++)
-        cout << var_list.getAt(i).getVarName() << " = " << fixed << setprecision(2) << stof(var_list.getAt(i).getValue()) << endl;
 }
 
 void Calculate::eval(string input_str) {
@@ -330,12 +309,29 @@ void Calculate::eval(string input_str) {
     if (str[0] == '-')
         str.insert(0, "0");
 
+    // Split and calculate
     bool check = 0;
-    for (int i = 0; i < str.length(); i++)
-        if (str[i] == '=')
-            check = 1;
-    if (check)
-        calVar(str);
-    else
-        cout << "Result: " << fixed << setprecision(2) << cal(str) << endl;
+    string sub_str;
+    for (int i = 0; i < str.length(); i++) {
+        if (str[i] != ';') {
+            if (str[i] == '=')
+                check = 1;
+            sub_str.push_back(str[i]);
+        }
+        if (str[i] == ';' || i == str.length() - 1) {
+            if (check == 1) {
+                calVar(sub_str);
+                check = 0;
+            } else
+                cout << "Result: " << fixed << setprecision(2) << cal(sub_str) << endl;
+            sub_str.clear();
+        }
+    }
+
+    // Print variables
+    if (var_list.length() != 0) {
+        cout << "Result:" << endl;
+        for (int i = 0; i < var_list.length(); i++)
+            cout << var_list.getAt(i).getVarName() << " = " << fixed << setprecision(2) << stof(var_list.getAt(i).getValue()) << endl;
+    }
 }
