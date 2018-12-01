@@ -8,7 +8,7 @@ int main() {
     string str;
     Calculate s;
     
-    cout << "Enter equation: ";
+    cout << "Enter equation (Split by ';' semicolon): ";
     getline(cin, str);
     s.eval(str);
 
