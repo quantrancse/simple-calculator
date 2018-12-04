@@ -8,7 +8,7 @@ using namespace std;
 
 // Check if Operator
 bool Calculate::checkOperator(char ch) {
-    if (ch == '#' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == '=' || ch == '^')
+    if (ch == '#' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == '=' || ch == '^' || ch == ';')
         return true;
     else
         return false;
@@ -258,12 +258,40 @@ void Calculate::calVar(string str) {
     }
 }
 
-void Calculate::eval(string input_str) {
+void Calculate::eval(string input) {
     string str;
+    bool check = 0;
+
+    // Optimize '+' and '-' and delete space
+    string input_str;
+    for (int i = 0; i < input.length(); i++) {
+        if (input[i] == '+' && checkOperator(input_str[input_str.length() - 1]))
+            continue;
+        if (input[i] == '-') {
+            if (input_str[input_str.length() - 1] == '+')
+                input_str.pop_back();
+            else if (input_str[input_str.length() - 1] == '-') {
+                input_str.pop_back();
+                input_str.push_back('+');
+                continue;
+            }
+        }
+        if (input[i] != ' ')
+            input_str.push_back(input[i]);
+    }
 
     // Check for valid input
     int count = 0;
     for (int i = 0; i < input_str.length(); i++) {
+        if (check == 1 && ((checkOperator(input_str[i]) && input_str[i] != '^') || i == input_str.length() - 1)) {
+            if (i == input_str.length() - 1) {
+                str.push_back(input_str[i]);
+                str.push_back(')');
+                break;
+            }
+            str.push_back(')');
+            check = 0;
+        }
         if (input_str[i] == ')')
             count--;
         if (count < 0) {
@@ -287,17 +315,14 @@ void Calculate::eval(string input_str) {
             cout << "Invalid Operator Input" << endl;
             exit(0);
         }
-        if (input_str[i] == '+' && checkOperator(str[str.length() - 1]))
-            continue;
-        if (input_str[i] == '-' && str[str.length() - 1] == '-') {
-            str.pop_back();
-            str.push_back('+');
-            continue;
-        }
         if (input_str[i] == '-' && (str[str.length() - 1] == '=' || str[str.length() - 1] == '('))
             str.push_back('0');
-        if (input_str[i] != ' ')
-            str.push_back(input_str[i]);
+        if ((str[str.length() - 1] == '*' || str[str.length() - 1] == '/') && input_str[i] == '-') {
+            str.push_back('(');
+            str.push_back('0');
+            check = 1;
+        }
+        str.push_back(input_str[i]);
     }
     if (count != 0) {
         cout << "Invalid Parentheses Input" << endl;
@@ -310,7 +335,7 @@ void Calculate::eval(string input_str) {
         str.insert(0, "0");
 
     // Split and calculate
-    bool check = 0;
+    check = 0;
     string sub_str;
     for (int i = 0; i < str.length(); i++) {
         if (str[i] != ';') {
