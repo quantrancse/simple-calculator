@@ -70,7 +70,7 @@ $ z = 50.00
 
 ## Authors
 
-* **Tran Trung Quan** - *Student at Ho Chi Minh City University of Technology* - [Quan Tran](https://quantrancse.me)
+* **Tran Trung Quan** - *Student at Ho Chi Minh City University of Technology* - [Quan Tran](https://quantrancse.github.io)
 
 
 
